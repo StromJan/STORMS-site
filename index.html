@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STORMS: cyclones reaching Finland</title>
+<style>
+  :root { --bg:#f4f6f8; --side:#fff; --card:#fff; --text:#1b222a; --muted:#5f6b78; --line:#dfe3e8;
+          --accent:#1f5fae; --on-accent:#fff; --accent-bg:#e8f0fa; --hover:#f1f4f7; --side-w:300px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#11151a; --side:#171c22; --card:#1a2027; --text:#e5e9ee; --muted:#98a3af; --line:#2a323c;
+            --accent:#6ea8ef; --on-accent:#0d1520; --accent-bg:#1c2a3b; --hover:#20272f; }
+  }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  html, body { margin:0; }
+  body { background:var(--bg); color:var(--text); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  a { color:var(--accent); }
+  button { font:inherit; color:inherit; }
+
+  /* layout: options column + content */
+  .layout { display:grid; grid-template-columns:var(--side-w) minmax(0, 1fr); min-height:100vh; }
+  .side { background:var(--side); border-right:1px solid var(--line); padding:20px 16px 24px;
+          position:sticky; top:0; height:100vh; overflow-y:auto; }
+  main { padding:20px 28px 28px; min-width:0; }
+
+  /* options column */
+  .brand { margin:0 4px 14px; }
+  .brand .name { font-size:20px; font-weight:700; letter-spacing:.02em; }
+  .brand .sub { color:var(--muted); font-size:13px; line-height:1.4; }
+  .run { display:grid; grid-template-columns:auto 1fr; gap:2px 10px; margin:0 4px 18px; font-size:13px; }
+  .run dt { color:var(--muted); }
+  .run dd { margin:0; }
+  .group { margin-bottom:18px; }
+  .group h2 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em;
+              color:var(--muted); margin:0 4px 6px; }
+  .item { display:block; width:100%; text-align:left; background:none; border:1px solid transparent;
+          border-radius:8px; padding:7px 10px; margin-bottom:2px; cursor:pointer; line-height:1.35; }
+  .item:hover { background:var(--hover); }
+  .item[aria-pressed=true] { background:var(--accent-bg); border-color:var(--accent); }
+  .item .head { display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:600; }
+  .item .line { display:block; color:var(--muted); font-size:12.5px; }
+  .tag { font-size:11px; font-weight:500; color:var(--muted); border:1px solid var(--line);
+         border-radius:999px; padding:0 7px; white-space:nowrap; }
+  .seg { display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin:0 2px; }
+  .seg button { flex:1; border:0; border-right:1px solid var(--line); background:none; padding:6px 4px;
+                font-size:13.5px; cursor:pointer; }
+  .seg button:last-child { border-right:0; }
+  .seg button:hover:not(:disabled):not([aria-pressed=true]) { background:var(--hover); }
+  .seg button[aria-pressed=true] { background:var(--accent); color:var(--on-accent); }
+  .seg button:disabled { opacity:.35; cursor:not-allowed; }
+  .none { color:var(--muted); font-size:13px; margin:0 4px; }
+
+  /* content */
+  .bar { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+  h1 { font-size:20px; margin:0; line-height:1.3; }
+  .subtitle { color:var(--muted); font-size:13.5px; }
+  .nav { display:flex; gap:6px; flex:none; }
+  .nav button { border:1px solid var(--line); background:var(--card); border-radius:8px; padding:5px 12px; cursor:pointer; }
+  .nav button:hover { background:var(--hover); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .maps { display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
+  figure { margin:0; }
+  figcaption { font-weight:600; margin-bottom:8px; }
+  figcaption span { color:var(--muted); font-weight:400; }
+  img.fig { display:block; width:100%; height:auto; border-radius:6px; background:#fff; }
+  /* one figure at a time: the whole figure fits in the window */
+  .single img.fig { width:auto; max-width:100%; max-height:calc(100vh - 130px); margin:0 auto; }
+  .notice { border-left:4px solid var(--accent); margin-bottom:16px; }
+  .empty { padding:48px 12px; text-align:center; color:var(--muted); }
+  .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fill, minmax(min(100%, 360px), 1fr)); }
+  .grid figcaption { font-weight:400; color:var(--muted); font-size:12.5px; margin:6px 0 0; }
+  footer { color:var(--muted); font-size:12px; margin-top:24px; max-width:900px; }
+  footer p { margin:0 0 6px; }
+
+  /* narrow screens: options above the content */
+  @media (max-width:900px) {
+    .layout { grid-template-columns:1fr; }
+    .side { position:static; height:auto; border-right:0; border-bottom:1px solid var(--line); padding:14px 12px 6px; }
+    main { padding:16px; }
+    .brand, .run { margin-bottom:10px; }
+    .group { margin-bottom:12px; }
+    /* systems and variables as rows to scroll sideways */
+    #systems, #variables { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; }
+    #systems .item, #variables .item { flex:0 0 auto; width:auto; border-color:var(--line); margin:0; }
+    #systems .item { min-width:150px; }
+    #systems .item[aria-pressed=true], #variables .item[aria-pressed=true] { border-color:var(--accent); }
+    .single img.fig { max-height:none; width:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+  <div class="brand">
+    <div class="name">STORMS</div>
+    <div class="sub">Extratropical cyclones reaching Finland</div>
+  </div>
+  <dl class="run">
+    <dt>Init</dt><dd>14 Nov 2026 12 UTC</dd>
+    <dt>Region</dt><dd>0°E–35°E, 50°N–70°N</dd>
+    <dt>Updated</dt><dd>14 Nov 2026 20:04 UTC</dd>
+  </dl>
+
+  <div class="group">
+    <button class="item" id="overview"><span class="head">Overview</span><span class="line">Track maps of both models</span></button>
+  </div>
+  <div class="group">
+    <h2>Systems</h2>
+    <div id="systems"></div>
+  </div>
+  <div class="group" id="g-view" hidden>
+    <h2>View</h2>
+    <div class="seg" id="views" role="group" aria-label="View">
+      <button data-v="compare">Compare</button><button data-v="diag">Diagnostics</button><button data-v="trend">Trend</button>
+    </div>
+  </div>
+  <div class="group" id="g-model" hidden>
+    <h2>Model</h2>
+    <div class="seg" id="models" role="group" aria-label="Model">
+      <button data-m="ifs">IFS</button><button data-m="aifs">AIFS</button>
+    </div>
+  </div>
+  <div class="group" id="g-var" hidden>
+    <h2>Variable</h2>
+    <div id="variables"></div>
+  </div>
+  <div class="group" id="g-other" hidden>
+    <button class="item" id="other"><span class="head">Other figures</span><span class="line" id="other-n"></span></button>
+  </div>
+</aside>
+
+<main>
+  <div class="bar">
+    <div><h1 id="title"></h1><div class="subtitle" id="subtitle"></div></div>
+    <div class="nav" id="nav" hidden>
+      <button id="prev" title="Previous system (&larr;)">&larr;</button><button id="next" title="Next system (&rarr;)">&rarr;</button>
+    </div>
+  </div>
+  <div id="content"></div>
+  <footer>
+    <p>Research prototype, not an official forecast. Cyclones are tracked in the control runs with
+    TempestExtremes (MSLP minima) and kept when their track enters the region box. Click a figure to open it full size.</p>
+    <p>Contains modified ECMWF IFS and AIFS open forecast data, &copy; European Centre for Medium-Range
+    Weather Forecasts (ECMWF), licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+    ECMWF does not accept any liability for errors or omissions in the data or for any use of it.
+    Coastlines: Natural Earth.</p>
+  </footer>
+</main>
+</div>
+
+<script>
+const D = {"version": "2026111412-1794686660", "summary": {"ifs": {"tracked": 27, "in_box": 3}, "aifs": {"tracked": 24, "in_box": 3}}, "systems": [{"n": 1, "status": "both", "models": {"ifs": {"track": 0, "mslp": 969.3, "wind": 25.4}, "aifs": {"track": 0, "mslp": 970.2, "wind": 24.5}}}, {"n": 2, "status": "both", "models": {"ifs": {"track": 1, "mslp": 974.0, "wind": 18.5}, "aifs": {"track": 1, "mslp": 972.1, "wind": 18.5}}}, {"n": 3, "status": "both", "models": {"ifs": {"track": 10, "mslp": 978.7, "wind": 15.0}, "aifs": {"track": 10, "mslp": 987.4, "wind": 13.9}}}], "fig": {"tracks": {"aifs": "tracks_aifs_2026111412.png", "ifs": "tracks_ifs_2026111412.png"}, "compare": {"1": "compare/compare_ifs_aifs_2026111412_system1.png", "2": "compare/compare_ifs_aifs_2026111412_system2.png", "3": "compare/compare_ifs_aifs_2026111412_system3.png"}, "diag": {"aifs": {"0": {"persistence": "diagnostics_aifs/footprint_aifs_2026111412_track0.persistence.png", "precip": "diagnostics_aifs/footprint_aifs_2026111412_track0.precip.png", "wind": "diagnostics_aifs/footprint_aifs_2026111412_track0.wind.png"}, "1": {"persistence": "diagnostics_aifs/footprint_aifs_2026111412_track1.persistence.png", "precip": "diagnostics_aifs/footprint_aifs_2026111412_track1.precip.png", "wind": "diagnostics_aifs/footprint_aifs_2026111412_track1.wind.png"}, "10": {"persistence": "diagnostics_aifs/footprint_aifs_2026111412_track10.persistence.png", "precip": "diagnostics_aifs/footprint_aifs_2026111412_track10.precip.png", "wind": "diagnostics_aifs/footprint_aifs_2026111412_track10.wind.png"}}, "ifs": {"0": {"persistence": "diagnostics_ifs/footprint_ifs_2026111412_track0.persistence.png", "precip": "diagnostics_ifs/footprint_ifs_2026111412_track0.precip.png", "wind": "diagnostics_ifs/footprint_ifs_2026111412_track0.wind.png"}, "1": {"persistence": "diagnostics_ifs/footprint_ifs_2026111412_track1.persistence.png", "precip": "diagnostics_ifs/footprint_ifs_2026111412_track1.precip.png", "wind": "diagnostics_ifs/footprint_ifs_2026111412_track1.wind.png"}, "10": {"persistence": "diagnostics_ifs/footprint_ifs_2026111412_track10.persistence.png", "precip": "diagnostics_ifs/footprint_ifs_2026111412_track10.precip.png", "wind": "diagnostics_ifs/footprint_ifs_2026111412_track10.wind.png"}}}, "trend": {"aifs": {"0": "trends_aifs/track_trend_aifs_2026111412_system0.png", "1": "trends_aifs/track_trend_aifs_2026111412_system1.png", "10": "trends_aifs/track_trend_aifs_2026111412_system10.png"}, "ifs": {"0": "trends_ifs/track_trend_ifs_2026111412_system0.png", "1": "trends_ifs/track_trend_ifs_2026111412_system1.png", "10": "trends_ifs/track_trend_ifs_2026111412_system10.png"}}, "other": []}};
+const MODEL_NAME = { ifs: "IFS", aifs: "AIFS" };
+const VIEW_NAME = { compare: "IFS vs AIFS", diag: "Diagnostics", trend: "Trend across inits" };
+const VAR_NAME = { wind: "Wind footprint", precip: "Precipitation", persistence: "Wind persistence",
+                   tracks: "Tracks", probability: "Track probability" };
+const VAR_ORDER = ["wind", "precip", "persistence"];          // plot.bash DIAGNOSTICS_VARIABLES
+const url = f => `img/${f}?v=${D.version}`;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const figure = (f, alt) => `<a href="${url(f)}" target="_blank" rel="noopener"><img class="fig" src="${url(f)}" alt="${esc(alt)}"></a>`;
+const fmt = (v, unit) => v == null ? "" : `${v.toFixed(0)} ${unit}`;
+const press = (sel, test) => document.querySelectorAll(sel).forEach(b => b.setAttribute("aria-pressed", test(b)));
+
+// page: "overview" | "system" | "other"
+const st = { page: "overview", i: 0, view: "compare", model: "ifs", variable: null };
+
+// Options column
+function statusTag(s) {
+  const t = s.status === "both" ? "IFS + AIFS" : s.status;
+  return t ? `<span class="tag">${esc(t)}</span>` : "";
+}
+function systemItem(s, k) {
+  const lines = Object.entries(s.models).map(([m, x]) => {
+    const vals = [fmt(x.mslp, "hPa"), fmt(x.wind, "m/s")].filter(Boolean).join(" · ");
+    return `<span class="line">${MODEL_NAME[m]}${vals ? " " + vals : ` track ${x.track}`}</span>`;
+  }).join("");
+  return `<button class="item sys" data-k="${k}"><span class="head">System ${s.n}${statusTag(s)}</span>${lines}</button>`;
+}
+$("systems").innerHTML = D.systems.length
+  ? D.systems.map(systemItem).join("")
+  : `<p class="none">No system reaches the box in this run.</p>`;
+if (D.fig.other.length) { $("g-other").hidden = false; $("other-n").textContent = `${D.fig.other.length} not sorted above`; }
+
+// Content
+function header(title, subtitle) { $("title").textContent = title; $("subtitle").textContent = subtitle || ""; }
+
+function renderOverview() {
+  header("Overview", "Cyclone tracks of the IFS and AIFS control runs");
+  const quiet = D.systems.length ? "" :
+    `<div class="card notice"><b>No cyclone track reaches the region box in this run.</b>
+     The page updates after each new 00 and 12 UTC run.</div>`;
+  const maps = Object.keys(MODEL_NAME).map(m => {
+    const s = D.summary[m];
+    const count = s ? `${s.in_box} of ${s.tracked ?? "?"} tracked systems reach the box` : "no data";
+    const body = D.fig.tracks[m] ? figure(D.fig.tracks[m], `${MODEL_NAME[m]} tracks`) : `<div class="empty">No track map</div>`;
+    return `<figure class="card"><figcaption>${MODEL_NAME[m]} control <span>&middot; ${count}</span></figcaption>${body}</figure>`;
+  }).join("");
+  $("content").innerHTML = quiet + `<div class="maps">${maps}</div>`;
+}
+
+function renderSystem() {
+  const s = D.systems[st.i];
+  const has = m => s.models[m] != null;
+  if (st.view !== "compare" && !has(st.model)) st.model = has("ifs") ? "ifs" : "aifs";
+  const track = s.models[st.model]?.track;
+
+  press("#views button", b => b.dataset.v === st.view);
+  press("#models button", b => b.dataset.m === st.model);
+  document.querySelectorAll("#models button").forEach(b => b.disabled = !has(b.dataset.m));
+  $("g-model").hidden = st.view === "compare";
+
+  const rank = v => (VAR_ORDER.indexOf(v.split(".")[0]) + 1 || 99);
+  const vars = st.view === "diag"
+    ? Object.keys(D.fig.diag[st.model]?.[track] || {}).sort((a, b) => rank(a) - rank(b) || a.localeCompare(b)) : [];
+  if (vars.length && !vars.includes(st.variable)) st.variable = vars.includes("wind") ? "wind" : vars[0];
+  $("g-var").hidden = !vars.length;
+  $("variables").innerHTML = vars.map(v =>
+    `<button class="item" data-var="${esc(v)}" aria-pressed="${v === st.variable}"><span class="head">${esc(VAR_NAME[v] || v)}</span></button>`).join("");
+
+  const ids = Object.entries(s.models).map(([m, x]) => `${MODEL_NAME[m]} track ${x.track}`).join(" · ");
+  let f, title, what;
+  if (st.view === "compare") {
+    f = D.fig.compare[s.n]; title = `System ${s.n} · IFS vs AIFS`; what = "comparison";
+  } else if (st.view === "diag") {
+    f = D.fig.diag[st.model]?.[track]?.[st.variable];
+    title = `System ${s.n} · ${MODEL_NAME[st.model]} ${VAR_NAME[st.variable] || st.variable || "diagnostics"}`;
+    what = "diagnostics figure";
+  } else {
+    f = D.fig.trend[st.model]?.[track]; title = `System ${s.n} · ${MODEL_NAME[st.model]} trend across inits`;
+    what = "trend figure";
+  }
+  header(title, ids);
+  $("content").innerHTML = f ? `<div class="card single">${figure(f, title)}</div>`
+    : `<div class="card empty">No ${what} for system ${s.n}${st.view === "compare" ? "" : " in " + MODEL_NAME[st.model]}.</div>`;
+}
+
+function renderOther() {
+  header("Other figures", "Figures whose file names the page does not recognise");
+  $("content").innerHTML = `<div class="grid">${D.fig.other.map(f =>
+    `<figure class="card">${figure(f, f)}<figcaption>${esc(f)}</figcaption></figure>`).join("")}</div>`;
+}
+
+function render() {
+  const sys = st.page === "system";
+  press("#overview", () => st.page === "overview");
+  press("#other", () => st.page === "other");
+  press("#systems .sys", b => sys && +b.dataset.k === st.i);
+  $("g-view").hidden = !sys; $("g-model").hidden = !sys; $("g-var").hidden = !sys;
+  $("nav").hidden = !sys || D.systems.length < 2;
+  if (sys) renderSystem(); else if (st.page === "other") renderOther(); else renderOverview();
+  writeHash();
+}
+
+// State in the URL (#system=2&view=diag&model=ifs&var=wind), so views can be linked
+function readHash() {
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.has("other") && D.fig.other.length) { st.page = "other"; return; }
+  const i = D.systems.findIndex(s => String(s.n) === h.get("system"));
+  if (i < 0) return;
+  st.page = "system"; st.i = i;
+  if (VIEW_NAME[h.get("view")]) st.view = h.get("view");
+  if (MODEL_NAME[h.get("model")]) st.model = h.get("model");
+  if (h.get("var")) st.variable = h.get("var");
+}
+function writeHash() {
+  let p = "";
+  if (st.page === "other") p = "other";
+  else if (st.page === "system") {
+    const q = new URLSearchParams({ system: D.systems[st.i].n, view: st.view });
+    if (st.view !== "compare") q.set("model", st.model);
+    if (st.view === "diag" && st.variable) q.set("var", st.variable);
+    p = q.toString();
+  }
+  history.replaceState(null, "", p ? "#" + p : location.pathname + location.search);
+}
+
+// Events
+const go = changes => { Object.assign(st, changes); render(); };
+$("overview").onclick = () => go({ page: "overview" });
+$("other").onclick = () => go({ page: "other" });
+$("systems").onclick = e => { const b = e.target.closest(".sys"); if (b) go({ page: "system", i: +b.dataset.k }); };
+$("views").onclick = e => { const b = e.target.closest("button"); if (b) go({ view: b.dataset.v }); };
+$("models").onclick = e => { const b = e.target.closest("button"); if (b && !b.disabled) go({ model: b.dataset.m }); };
+$("variables").onclick = e => { const b = e.target.closest("button"); if (b) go({ variable: b.dataset.var }); };
+const step = d => go({ i: (st.i + d + D.systems.length) % D.systems.length });
+$("prev").onclick = () => step(-1);
+$("next").onclick = () => step(1);
+document.addEventListener("keydown", e => {
+  if (st.page !== "system" || e.target.closest("input, select, textarea")) return;
+  if (e.key === "ArrowLeft") step(-1);
+  if (e.key === "ArrowRight") step(1);
+});
+readHash();
+render();
+</script>
+</body>
+</html>
